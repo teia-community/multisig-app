@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { MultisigContext } from '../context';
-import { TezosAddressLink } from '../link';
-import { Button } from '../button';
+import { MultisigContext } from './context';
+import { TezosAddressLink } from './links';
+import { Button } from './button';
 
 
 export function Header() {
@@ -38,17 +38,17 @@ export function Navigation() {
 }
 
 export function Wallet() {
-    // Get the multisig context
-    const context = useContext(MultisigContext);
+    // Get the required multisig context information
+    const { userAddress, connectWallet, disconnectWallet } = useContext(MultisigContext);
 
     return (
         <div className='sync-container'>
-            {context.activeAccount &&
-                <TezosAddressLink address={context.activeAccount.address} shorten />
+            {userAddress &&
+                <TezosAddressLink address={userAddress} shorten />
             }
-            {context.activeAccount?
-                <Button text='unsync' onClick={() => context.disconnectWallet()} /> :
-                <Button text='sync' onClick={() => context.connectWallet()} />
+            {userAddress ?
+                <Button text='unsync' onClick={() => disconnectWallet()} /> :
+                <Button text='sync' onClick={() => connectWallet()} />
             }
         </div>
     );

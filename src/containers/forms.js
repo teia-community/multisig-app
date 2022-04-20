@@ -1,59 +1,60 @@
 import React, { useContext, useState } from 'react';
-import { MultisigContext } from '../context';
-import { Button } from '../button';
-import { IpfsLink } from '../link';
-import { tokens } from '../utils';
+import { TOKENS } from '../constants';
+import { MultisigContext } from './context';
+import { Button } from './button';
+import { IpfsLink } from './links';
 
 
 export function ContractSelectionForm() {
-    // Get the multisig context
-    const context = useContext(MultisigContext);
+    // Get the required multisig context information
+    const { contractAddresses, contractAddress, setContractAddress } = useContext(MultisigContext);
 
     // Set the component state
-    const [contractAddress, setContractAddress] = useState(context.contractAddress);
+    const [multisigAddress, setMultisigAddress] = useState(contractAddress);
 
     // Define the on submit handler
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
-        context.setContractAddress(contractAddress);
-     };
+        setContractAddress(multisigAddress);
+    };
 
     return (
-        <>
-            <section>
-                <h2>Deployed multisigs</h2>
-                <p>Use this form to select one of the deployed multisigs. Click the load button to access the multisig information.</p>
-                <form onSubmit={handleSubmit}>
-                    <label className='form-input'>Multisig address:
-                        {' '}
-                        <input
-                            type='text'
-                            list='multisigContracts'
-                            spellCheck='false'
-                            minLength='36'
-                            maxLength='36'
-                            className='contract-address-input'
-                            value={contractAddress}
-                            onMouseDown={() => setContractAddress('')}
-                            onChange={(e) => setContractAddress(e.target.value)}
-                        />
-                        <datalist id='multisigContracts'>
-                            <option value=''></option>
-                            {context.contractAddresses?.map((address, index) => (
-                                <option key={index} value={address}>test multisig {context.contractAddresses.length - index}</option>
-                            ))}
-                        </datalist>
-                    </label>
-                    <input type='submit' value='load' />
-                </form>
-            </section>
-        </>
+        <section>
+            <h2>Deployed multisigs</h2>
+            <p>
+                Use this form to select one of the deployed multisigs.
+                Click the load button to access the multisig information.
+            </p>
+            <form onSubmit={handleSubmit}>
+                <label className='form-input'>Multisig address:
+                    {' '}
+                    <input
+                        type='text'
+                        list='multisigContracts'
+                        spellCheck='false'
+                        minLength='36'
+                        maxLength='36'
+                        className='contract-address-input'
+                        value={multisigAddress}
+                        onMouseDown={() => setMultisigAddress('')}
+                        onChange={e => setMultisigAddress(e.target.value)}
+                    />
+                    <datalist id='multisigContracts'>
+                        <option value=''></option>
+                        {contractAddresses?.map((address, index) => (
+                            <option key={index} value={address}>test multisig {contractAddresses.length - index}</option>
+                        ))}
+                    </datalist>
+                </label>
+                <input type='submit' value='load' />
+            </form>
+        </section>
     );
 }
 
 export function OriginateMultisigForm() {
-    // Get the multisig context
-    const context = useContext(MultisigContext);
+    // Get the required multisig context information
+    const { originate } = useContext(MultisigContext);
 
     // Set the component state
     const [name, setName] = useState('My new multisig');
@@ -64,7 +65,7 @@ export function OriginateMultisigForm() {
     // Define the on change handler
     const handleChange = (index, value) => {
         // Create a new users array
-        const newUsers = users.map((user, i) => (i === index)? value : user);
+        const newUsers = users.map((user, i) => (i === index) ? value : user);
 
         // Update the component state
         setUsers(newUsers);
@@ -93,82 +94,83 @@ export function OriginateMultisigForm() {
     };
 
     // Define the on submit handler
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
-        context.originate({
+        originate({
             name: name,
             users: users,
             minimumVotes: minimumVotes,
             expirationTime: expirationTime
         });
-     };
+    };
 
     return (
-        <>
-            <section>
-                <h2>Multisig configuration</h2>
-                <p>Use this form to define the parameters of your new multisig / mini-DAO. The origination cost will be a bit more than 2 ꜩ.</p>
-                <form onSubmit={handleSubmit}>
-                    <div className='form-input'>
-                        <label>Name:
-                            {' '}
-                            <input
-                                type='text'
-                                spellCheck='false'
-                                minLength='1'
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                        </label>
-                        <br />
-                        <label className='users-input'>Multisig users:
-                            <div className='users-input-container'>
-                                {users.map((user, index) => (
-                                    <label key={index} className='user-input'>User address:
-                                        {' '}
-                                        <input
-                                            type='text'
-                                            spellCheck='false'
-                                            minLength='36'
-                                            maxLength='36'
-                                            className='tezos-wallet-input'
-                                            value={user}
-                                            onChange={(e) => handleChange(index, e.target.value)}
-                                        />
-                                    </label>
-                                ))}
-                            </div>
-                            <Button text='+' onClick={(e) => handleClick(e, true)} />
-                            {' '}
-                            <Button text='-' onClick={(e) => handleClick(e, false)} />
-                        </label>
-                        <label>Minimum number of positive votes to approve a proposal:
-                            {' '}
-                            <input
-                                type='number'
-                                min='1'
-                                max={users.length}
-                                step='1'
-                                value={minimumVotes}
-                                onChange={(e) => setMinimumVotes(e.target.value)}
-                            />
-                        </label>
-                        <br />
-                        <label>Proposals expiration time (days):
-                            {' '}
-                            <input
-                                type='number'
-                                min='1'
-                                step='1'
-                                value={expirationTime}
-                                onChange={(e) => setExpirationTime(e.target.value)}
-                            />
-                        </label>
-                    </div>
-                    <input type='submit' value='originate' />
-                </form>
-            </section>
-        </>
+        <section>
+            <h2>Multisig configuration</h2>
+            <p>
+                Use this form to define the parameters of your new multisig / mini-DAO.
+                The origination cost will be a bit more than 2 ꜩ.
+            </p>
+            <form onSubmit={handleSubmit}>
+                <div className='form-input'>
+                    <label>Name:
+                        {' '}
+                        <input
+                            type='text'
+                            spellCheck='false'
+                            minLength='1'
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                        />
+                    </label>
+                    <br />
+                    <label className='users-input'>Multisig users:
+                        <div className='users-input-container'>
+                            {users.map((user, index) => (
+                                <label key={index} className='user-input'>User address:
+                                    {' '}
+                                    <input
+                                        type='text'
+                                        spellCheck='false'
+                                        minLength='36'
+                                        maxLength='36'
+                                        className='tezos-wallet-input'
+                                        value={user}
+                                        onChange={e => handleChange(index, e.target.value)}
+                                    />
+                                </label>
+                            ))}
+                        </div>
+                        <Button text='+' onClick={e => handleClick(e, true)} />
+                        {' '}
+                        <Button text='-' onClick={e => handleClick(e, false)} />
+                    </label>
+                    <label>Minimum number of positive votes to approve a proposal:
+                        {' '}
+                        <input
+                            type='number'
+                            min='1'
+                            max={users.length}
+                            step='1'
+                            value={minimumVotes}
+                            onChange={e => setMinimumVotes(e.target.value)}
+                        />
+                    </label>
+                    <br />
+                    <label>Proposals expiration time (days):
+                        {' '}
+                        <input
+                            type='number'
+                            min='1'
+                            step='1'
+                            value={expirationTime}
+                            onChange={e => setExpirationTime(e.target.value)}
+                        />
+                    </label>
+                </div>
+                <input type='submit' value='originate' />
+            </form>
+        </section>
     );
 }
 
@@ -177,7 +179,7 @@ export function CreateProposalForms() {
     const context = useContext(MultisigContext);
 
     // Return if the user is not connected
-    if (!context.activeAccount) {
+    if (!context.userAddress) {
         return (
             <section>
                 <p>You need to sync your wallet to be able to create proposal.</p>
@@ -186,7 +188,7 @@ export function CreateProposalForms() {
     }
 
     // Return if the user is not one of the multisig users
-    if (!(context.storage && context.storage.users.includes(context.activeAccount.address))) {
+    if (!context.storage?.users.includes(context.userAddress)) {
         return (
             <section>
                 <p>Only multisig users can create new proposals.</p>
@@ -202,9 +204,7 @@ export function CreateProposalForms() {
                     Use this form to create a proposal that, if accepted, it will transfer
                     the specified amount of tez from the multisig to a list of tezos addresses.
                 </p>
-                <TransferTezProposalForm
-                    handleSubmit={context.createTransferMutezProposal}
-                />
+                <TransferTezProposalForm handleSubmit={context.createTransferMutezProposal} />
             </section>
 
             <section>
@@ -213,9 +213,7 @@ export function CreateProposalForms() {
                     Use this form to create a proposal that, if accepted, it will transfer
                     the specified amount of token editions from the multisig to a list of tezos addresses.
                 </p>
-                <TransferTokenProposalForm
-                    handleSubmit={context.createTransferTokenProposal}
-                />
+                <TransferTokenProposalForm handleSubmit={context.createTransferTokenProposal} />
             </section>
 
             <section>
@@ -250,9 +248,7 @@ export function CreateProposalForms() {
                     consequences. The lambda function code should have been revised by some trusted smart contract expert
                     before the proposal is accepted and executed.
                 </p>
-                <LambdaFunctionProposalForm
-                    handleSubmit={context.createLambdaFunctionProposal}
-                />
+                <LambdaFunctionProposalForm handleSubmit={context.createLambdaFunctionProposal} />
             </section>
 
             <section>
@@ -264,9 +260,7 @@ export function CreateProposalForms() {
                     Warning: The minimum number of positive votes required to approve a proposal will not be updated,
                     so adding a new user will effectively make easier to approve proposals.
                 </p>
-                <AddUserProposalForm
-                    handleSubmit={context.createAddUserProposal}
-                />
+                <AddUserProposalForm handleSubmit={context.createAddUserProposal} />
             </section>
 
             <section>
@@ -324,7 +318,7 @@ export function CreateProposalForms() {
 function TransferTezProposalForm(props) {
     // Set the component state
     const [transfers, setTransfers] = useState([
-        {amount: 0, destination: ''}
+        { amount: 0, destination: '' }
     ]);
 
     // Define the on change handler
@@ -355,12 +349,12 @@ function TransferTezProposalForm(props) {
 
         // Create a new transfers array
         const newTransfers = transfers.map((transfer) => (
-            {amount: transfer.amount, destination: transfer.destination}
+            { amount: transfer.amount, destination: transfer.destination }
         ));
 
         // Add or remove a transfer from the list
         if (increase) {
-            newTransfers.push({amount: 0, destination: ''});
+            newTransfers.push({ amount: 0, destination: '' });
         } else if (newTransfers.length > 1) {
             newTransfers.pop();
         }
@@ -370,7 +364,7 @@ function TransferTezProposalForm(props) {
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(
             transfers.map((transfer) => ({
@@ -385,7 +379,7 @@ function TransferTezProposalForm(props) {
             <div className='form-input'>
                 <div className='transfers-input'>
                     {transfers.map((transfer, index) => (
-                        <div key={index}  className='transfer-input'>
+                        <div key={index} className='transfer-input'>
                             <label>Amount to transfer (ꜩ):
                                 {' '}
                                 <input
@@ -393,7 +387,7 @@ function TransferTezProposalForm(props) {
                                     min='0'
                                     step='0.000001'
                                     value={transfer.amount}
-                                    onChange={(e) => handleChange(index, 'amount', e.target.value)}
+                                    onChange={e => handleChange(index, 'amount', e.target.value)}
                                 />
                             </label>
                             <br />
@@ -406,15 +400,15 @@ function TransferTezProposalForm(props) {
                                     maxLength='36'
                                     className='tezos-wallet-input'
                                     value={transfer.destination}
-                                    onChange={(e) => handleChange(index, 'destination', e.target.value)}
+                                    onChange={e => handleChange(index, 'destination', e.target.value)}
                                 />
                             </label>
                         </div>
                     ))}
                 </div>
-                <Button text='+' onClick={(e) => handleClick(e, true)} />
+                <Button text='+' onClick={e => handleClick(e, true)} />
                 {' '}
-                <Button text='-' onClick={(e) => handleClick(e, false)} />
+                <Button text='-' onClick={e => handleClick(e, false)} />
             </div>
             <input type='submit' value='send proposal' />
         </form>
@@ -426,7 +420,7 @@ function TransferTokenProposalForm(props) {
     const [tokenContract, setTokenContract] = useState('');
     const [tokenId, setTokenId] = useState('');
     const [transfers, setTransfers] = useState([
-        {amount: 0, destination: ''}
+        { amount: 0, destination: '' }
     ]);
 
     // Define the on change handler
@@ -457,12 +451,12 @@ function TransferTokenProposalForm(props) {
 
         // Create a new transfers array
         const newTransfers = transfers.map((transfer) => (
-            {amount: transfer.amount, destination: transfer.destination}
+            { amount: transfer.amount, destination: transfer.destination }
         ));
 
         // Add or remove a transfer from the list
         if (increase) {
-            newTransfers.push({amount: 0, destination: ''});
+            newTransfers.push({ amount: 0, destination: '' });
         } else if (newTransfers.length > 1) {
             newTransfers.pop();
         }
@@ -472,9 +466,17 @@ function TransferTokenProposalForm(props) {
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
-        props.handleSubmit(tokenContract, tokenId, transfers);
+
+        // Create a new transfers array that makes use of the correct decimals
+        const token = TOKENS.find(token => token.fa2 === tokenContract);
+        const newTransfers = transfers.map(transfer => (
+            { amount: token ? transfer.amount * token.decimals : transfer.amount, destination: transfer.destination }
+        ));
+
+        // Submit the proposal
+        props.handleSubmit(tokenContract, tokenId, newTransfers);
     };
 
     return (
@@ -491,11 +493,11 @@ function TransferTokenProposalForm(props) {
                         className='contract-address-input'
                         value={tokenContract}
                         onMouseDown={() => setTokenContract('')}
-                        onChange={(e) => setTokenContract(e.target.value)}
+                        onChange={e => setTokenContract(e.target.value)}
                     />
                     <datalist id='tokenContracts'>
                         <option value=''></option>
-                        {tokens.map((token) => (
+                        {TOKENS.map((token) => (
                             <option key={token.fa2} value={token.fa2}>{token.name}</option>
                         ))}
                     </datalist>
@@ -508,13 +510,13 @@ function TransferTokenProposalForm(props) {
                         min='0'
                         step='1'
                         value={tokenId}
-                        onChange={(e) => setTokenId(e.target.value)}
+                        onChange={e => setTokenId(e.target.value)}
                     />
                 </label>
                 <br />
                 <div className='transfers-input'>
                     {transfers.map((transfer, index) => (
-                        <div key={index}  className='transfer-input'>
+                        <div key={index} className='transfer-input'>
                             <label>Token editions:
                                 {' '}
                                 <input
@@ -522,7 +524,7 @@ function TransferTokenProposalForm(props) {
                                     min='1'
                                     step='1'
                                     value={transfer.amount}
-                                    onChange={(e) => handleChange(index, 'amount', e.target.value)}
+                                    onChange={e => handleChange(index, 'amount', e.target.value)}
                                 />
                             </label>
                             <br />
@@ -535,15 +537,15 @@ function TransferTokenProposalForm(props) {
                                     maxLength='36'
                                     className='tezos-wallet-input'
                                     value={transfer.destination}
-                                    onChange={(e) => handleChange(index, 'destination', e.target.value)}
+                                    onChange={e => handleChange(index, 'destination', e.target.value)}
                                 />
                             </label>
                         </div>
                     ))}
                 </div>
-                <Button text='+' onClick={(e) => handleClick(e, true)} />
+                <Button text='+' onClick={e => handleClick(e, true)} />
                 {' '}
-                <Button text='-' onClick={(e) => handleClick(e, false)} />
+                <Button text='-' onClick={e => handleClick(e, false)} />
             </div>
             <input type='submit' value='send proposal' />
         </form>
@@ -556,13 +558,13 @@ function TextProposalForm(props) {
     const [ipfsPath, setIpfsPath] = useState(undefined);
 
     // Define the on change handler
-    const handleChange = (e) => {
+    const handleChange = e => {
         setFile(e.target.files[0]);
         setIpfsPath(undefined);
     };
 
     // Define the on click handler
-    const handleClick = async (e) => {
+    const handleClick = async e => {
         e.preventDefault();
 
         // Update the component state
@@ -570,7 +572,7 @@ function TextProposalForm(props) {
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(ipfsPath);
     };
@@ -587,7 +589,7 @@ function TextProposalForm(props) {
                 </label>
                 {file &&
                     <div>
-                        <Button text={ipfsPath? 'uploaded' : 'upload to IPFS'} onClick={handleClick} />
+                        <Button text={ipfsPath ? 'uploaded' : 'upload to IPFS'} onClick={handleClick} />
                         {' '}
                         {ipfsPath &&
                             <IpfsLink path={ipfsPath} />
@@ -605,12 +607,12 @@ function LambdaFunctionProposalForm(props) {
     const [michelineCode, setMichelineCode] = useState('');
 
     // Define the on change handler
-    const handleChange = (e) => {
+    const handleChange = e => {
         setMichelineCode(e.target.value);
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(michelineCode);
     };
@@ -636,12 +638,12 @@ function AddUserProposalForm(props) {
     const [user, setUser] = useState('');
 
     // Define the on change handler
-    const handleChange = (e) => {
+    const handleChange = e => {
         setUser(e.target.value);
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(user);
     };
@@ -670,12 +672,12 @@ function RemoveUserProposalForm(props) {
     const [user, setUser] = useState('');
 
     // Define the on change handler
-    const handleChange = (e) => {
+    const handleChange = e => {
         setUser(e.target.value);
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(user);
     };
@@ -699,7 +701,7 @@ function RemoveUserProposalForm(props) {
                     <option value=''></option>
                     {props.users.map((userWallet, index) => (
                         <option key={index} value={userWallet}>
-                            {props.aliases? props.aliases[userWallet] : userWallet}
+                            {props.aliases ? props.aliases[userWallet] : userWallet}
                         </option>
                     ))}
                 </datalist>
@@ -714,12 +716,12 @@ function MinimumVotesProposalForm(props) {
     const [minimumVotes, setMinimumVotes] = useState(props.defaultValue);
 
     // Define the on change handler
-    const handleChange = (e) => {
+    const handleChange = e => {
         setMinimumVotes(Math.round(e.target.value));
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(minimumVotes);
     };
@@ -746,12 +748,12 @@ function ExpirationTimeProposalForm(props) {
     const [expirationTime, setExpirationTime] = useState(props.defaultValue);
 
     // Define the on change handler
-    const handleChange = (e) => {
+    const handleChange = e => {
         setExpirationTime(Math.round(e.target.value));
     };
 
     // Define the on submit handler
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         props.handleSubmit(expirationTime);
     };

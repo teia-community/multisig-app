@@ -1,11 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { MultisigContextProvider } from './context';
-import { Header } from './header';
-import { Footer } from './footer';
-import { ContractSelectionForm, CreateProposalForms, OriginateMultisigForm } from './forms';
-import { Parameters } from './parameters';
-import { Proposals } from './proposals';
+import { MultisigContextProvider } from './containers/context';
+import { Header } from './containers/header';
+import { Footer } from './containers/footer';
+import { Parameters } from './containers/parameters';
+import { Proposals } from './containers/proposals';
+import { ContractSelectionForm, CreateProposalForms, OriginateMultisigForm } from './containers/forms';
 
 
 export function App() {

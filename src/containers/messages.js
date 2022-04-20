@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../button';
+import { Button } from './button';
 
 
 export function InformationMessage(props) {
@@ -17,7 +17,7 @@ export function ConfirmationMessage(props) {
         <div className='message-container'>
             <div className='confirmation-message'>
                 <p>{props.message}</p>
-                <Button text='ok' onClick={props.onClick}/>
+                <Button text='ok' onClick={props.onClick} />
             </div>
         </div>
     );
@@ -28,7 +28,7 @@ export function ErrorMessage(props) {
         <div className='message-container'>
             <div className='error-message'>
                 <p>{props.message}</p>
-                <Button text='ok' onClick={props.onClick}/>
+                <Button text='ok' onClick={props.onClick} />
             </div>
         </div>
     );
