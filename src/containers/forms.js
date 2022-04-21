@@ -182,7 +182,7 @@ export function CreateProposalForms() {
     if (!context.userAddress) {
         return (
             <section>
-                <p>You need to sync your wallet to be able to create proposal.</p>
+                <p>You need to sync your wallet to be able to create proposals.</p>
             </section>
         );
     }
