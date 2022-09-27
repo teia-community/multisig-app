@@ -5,9 +5,9 @@ export const DEFAULT_CONTRACT_ADDRESS = 'KT1PKBTVmdxfgkFvSeNUQacYiEFsPBw16B4P';
 
 export const RPC_NODE = 'https://mainnet.api.tez.ie';
 
-export const IPFS_CLIENT = 'https://ipfs.infura.io:5001/api/v0';
+export const IPFS_UPLOAD_PROXY = 'https://ipfsproxy.teia.rocks';
 
-export const IPFS_GATEWAY = 'https://infura-ipfs.io/ipfs/';
+export const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
 
 export const TOKENS = [
     {
