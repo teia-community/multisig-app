@@ -14,32 +14,27 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
-
-      - uses: pnpm/action-setup@v2.1.0
-        with:
-          version: 6.32.3
+        uses: actions/checkout@v4
 
       - name: 🔧 Installing Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: ${{ !env.ACT && 'npm' || '' }}
           cache-dependency-path: package-lock.json
 
       - name: 🌏 Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: ⚙️ Build
         run: PUBLIC_URL="https://teia-community.github.io/multisig-app" npm run build
 
       - name: 🧹 Add nojekyll file
         working-directory: build
-        run: |
-          touch .nojekyll
+        run: touch .nojekyll
 
       - name: 🚀 Deploy to Github Pages
-        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: build # The folder the action should deploy.
+          branch: gh-pages
+          folder: build
